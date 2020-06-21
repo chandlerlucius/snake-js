@@ -7,6 +7,8 @@ const snake = function() {
     let eggY;
     let snakeX;
     let snakeY;
+    let width;
+    let height;
     let ctx;
     
     //Define snake details
@@ -14,8 +16,8 @@ const snake = function() {
     let snakeSize = 20;
 
     const setupGame = function () {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+        width = window.innerWidth;
+        height = window.innerHeight;
         
         eggX = random(width - eggSize);
         eggY = random(height - eggSize);
@@ -46,12 +48,16 @@ const snake = function() {
     }
 
     const moveRight = function() {
-        setInterval(function () {
+        const rightInterval = setInterval(function () {
             snakeX += snakeSize;
             ctx.fillRect(snakeX, snakeY, snakeSize, snakeSize);
             snake.push([snakeX, snakeY]);
             const old = snake.shift();
             ctx.clearRect(old[0] - 1, old[1], snakeSize, snakeSize);
+            if(snakeX === 0 || snakeX === width || snakeY === 0 || snakeY === height) {
+                clearInterval(rightInterval);
+                alert('You Lost!');
+            }
         }, speed);
     }
     
