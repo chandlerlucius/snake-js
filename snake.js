@@ -2,6 +2,16 @@ const snake = function () {
     //Declare variables
     const eggSize = 20;
     const speed = 100;
+    const a = "KeyA";
+    const left = "ArrowLeft";
+    const d = "KeyD";
+    const right = "ArrowRight";
+    const w = "KeyW";
+    const up = "ArrowUp";
+    const s = "KeyS";
+    const down = "ArrowDown";
+    const leftRight = [a, left, d, right];
+    const upDown = [w, up, s, down];
 
     let eggX;
     let eggY;
@@ -47,33 +57,41 @@ const snake = function () {
 
     const movement = {
         timeout: 0,
-        prevKeyCode: 0,
+        prevCode: 0,
 
         startMove(event) {
-            if (event.keyCode == snake.prevKeyCode) {
+            if (event.code === snake.prevCode ||
+                (leftRight.indexOf(event.code) > -1 && leftRight.indexOf(snake.prevCode) > -1) ||
+                (upDown.indexOf(event.code) > -1 && upDown.indexOf(snake.prevCode) > -1)) {
                 return;
             }
             clearTimeout(movement.timeout);
-            movement.move(event.keyCode);
+            movement.move(event.code);
         },
 
-        move(keyCode) {
+        move(code) {
             this.timeout = setTimeout(function () {
-                if (keyCode == '37' || keyCode == '65') {
-                    // left arrow or a key
-                    snakeX -= snakeSize;
-                } else if (keyCode == '38' || keyCode == '87') {
-                    // up arrow or w key
-                    snakeY -= snakeSize;
-                } else if (keyCode == '39' || keyCode == '68') {
-                    // right arrow or d key
-                    snakeX += snakeSize;
-                } else if (keyCode == '40' || keyCode == '83') {
-                    // down arrow or s key
-                    snakeY += snakeSize;
-                } else {
-                    return;
+                switch (code) {
+                    case a:
+                    case left:
+                        snakeX -= snakeSize;
+                        break;
+                    case w:
+                    case up:
+                        snakeY -= snakeSize;
+                        break;
+                    case d:
+                    case right:
+                        snakeX += snakeSize;
+                        break;
+                    case s:
+                    case down:
+                        snakeY += snakeSize;
+                        break;
+                    default:
+                        return;
                 }
+                snake.prevCode = code;
 
                 ctx.fillRect(snakeX, snakeY, snakeSize, snakeSize);
                 snake.push([snakeX, snakeY]);
@@ -82,7 +100,7 @@ const snake = function () {
                 ctx.clearRect(old[0], old[1], snakeSize, snakeSize);
 
                 if (snakeX > 0 && snakeX < width && snakeY > 0 && snakeY < height) {
-                    movement.move(keyCode);
+                    movement.move(code);
                 } else {
                     alert('You Lost!');
                 }
@@ -95,7 +113,8 @@ const snake = function () {
     }
 
     document.addEventListener('DOMContentLoaded', setupGame);
-    document.addEventListener("keydown", movement.startMove);
+    window.addEventListener('keydown', movement.startMove);
+    // window.addEventListener('resize', resizeCanvas);
 }
 
 snake();
