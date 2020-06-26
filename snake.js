@@ -1,7 +1,5 @@
 const snake = function () {
     //Declare variables
-    const eggSize = 20;
-    const speed = 100;
     const a = "KeyA";
     const left = "ArrowLeft";
     const d = "KeyD";
@@ -22,37 +20,54 @@ const snake = function () {
     let ctx;
 
     //Define snake details
+    const speed = 100;
     const snake = [];
-    let snakeSize = 20;
+    const snakeSize = 20;
 
     const setupGame = function () {
         width = window.innerWidth;
         height = window.innerHeight;
 
-        eggX = random(width - eggSize);
-        eggY = random(height - eggSize);
-
+        //Start snake in middle of screen
         snakeX = Math.floor(width / 2);
         snakeY = Math.floor(height / 2);
 
+        //Normalize snake location to be on grid
+        snakeX -= snakeX % snakeSize;
+        snakeY -= snakeY % snakeSize;
+
+        //Pick a random place for egg to start
+        eggX = random(width - snakeSize);
+        eggY = random(height - snakeSize);
+
+        //Normalize egg location to place it on grid where snake will be
+        eggX -= eggX % snakeSize;
+        eggY -= eggY % snakeSize;
+
+        //Resize canvas to be full screen
         const canvas = document.getElementsByClassName("canvas")[0];
         canvas.width = width;
         canvas.height = height;
 
+        //Setup canvas context to draw in white
         ctx = canvas.getContext("2d");
         ctx.fillStyle = "#FFFFFF";
 
+        //Setup snake to start with length of 3
         snake.push([snakeX, snakeY]);
         snakeX += snakeSize;
         snake.push([snakeX, snakeY]);
         snakeX += snakeSize;
         snake.push([snakeX, snakeY]);
 
+        //Draw snake on canvas
         for (let i = 1; i <= snake.length; i++) {
             const xy = snake[i - 1];
             ctx.fillRect(xy[0], xy[1], snakeSize, snakeSize);
         }
-        ctx.fillRect(eggX, eggY, eggSize, eggSize);
+
+        //Draw egg on canvas
+        ctx.fillRect(eggX, eggY, snakeSize, snakeSize);
     }
 
     const movement = {
@@ -60,17 +75,21 @@ const snake = function () {
         prevCode: 0,
 
         startMove(event) {
+            //If same button pressed or opposite button pressed (left & right) return
             if (event.code === snake.prevCode ||
                 (leftRight.indexOf(event.code) > -1 && leftRight.indexOf(snake.prevCode) > -1) ||
                 (upDown.indexOf(event.code) > -1 && upDown.indexOf(snake.prevCode) > -1)) {
                 return;
             }
+
+            //If new button pressed, clear the timeout and begin move
             clearTimeout(movement.timeout);
             movement.move(event.code);
         },
 
         move(code) {
             this.timeout = setTimeout(function () {
+                //Change new snake addition based on key pressed
                 switch (code) {
                     case a:
                     case left:
@@ -93,12 +112,15 @@ const snake = function () {
                 }
                 snake.prevCode = code;
 
-                ctx.fillRect(snakeX, snakeY, snakeSize, snakeSize);
+                //Add new snake addition to array and draw it on canvas
                 snake.push([snakeX, snakeY]);
+                ctx.fillRect(snakeX, snakeY, snakeSize, snakeSize);
 
+                //Remove oldest snake addition from array and clear it from canvas
                 const old = snake.shift();
                 ctx.clearRect(old[0], old[1], snakeSize, snakeSize);
 
+                //Check if snake will hit the edge
                 if (snakeX > 0 && snakeX < width && snakeY > 0 && snakeY < height) {
                     movement.move(code);
                 } else {
