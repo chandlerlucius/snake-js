@@ -1,5 +1,5 @@
 const snake = function () {
-    //Declare variables
+    //Keyboard constants
     const a = "KeyA";
     const left = "ArrowLeft";
     const d = "KeyD";
@@ -11,6 +11,12 @@ const snake = function () {
     const leftRight = [a, left, d, right];
     const upDown = [w, up, s, down];
 
+    //Snake constants
+    const speed = 100;
+    const snake = [];
+    const snakeSize = 20;
+
+    //Mutable vars
     let eggX;
     let eggY;
     let snakeX;
@@ -18,11 +24,6 @@ const snake = function () {
     let width;
     let height;
     let ctx;
-
-    //Define snake details
-    const speed = 100;
-    const snake = [];
-    const snakeSize = 20;
 
     const setupGame = function () {
         width = window.innerWidth;
@@ -35,14 +36,6 @@ const snake = function () {
         //Normalize snake location to be on grid
         snakeX -= snakeX % snakeSize;
         snakeY -= snakeY % snakeSize;
-
-        //Pick a random place for egg to start
-        eggX = random(width - snakeSize);
-        eggY = random(height - snakeSize);
-
-        //Normalize egg location to place it on grid where snake will be
-        eggX -= eggX % snakeSize;
-        eggY -= eggY % snakeSize;
 
         //Resize canvas to be full screen
         const canvas = document.getElementsByClassName("canvas")[0];
@@ -65,6 +58,18 @@ const snake = function () {
             const xy = snake[i - 1];
             ctx.fillRect(xy[0], xy[1], snakeSize, snakeSize);
         }
+
+        drawEgg();
+    }
+
+    const drawEgg = function () {
+        //Pick a random place for egg to start
+        eggX = random(width - snakeSize);
+        eggY = random(height - snakeSize);
+
+        //Normalize egg location to place it on grid where snake will be
+        eggX -= eggX % snakeSize;
+        eggY -= eggY % snakeSize;
 
         //Draw egg on canvas
         ctx.fillRect(eggX, eggY, snakeSize, snakeSize);
@@ -122,6 +127,11 @@ const snake = function () {
 
                 //Check if snake will hit the edge
                 if (snakeX > 0 && snakeX < width && snakeY > 0 && snakeY < height) {
+                    //Check if snake is eating the egg
+                    if (snakeY === eggY && snakeX === eggX) {
+                        snake.push([eggX, eggY]);
+                        drawEgg();
+                    }
                     movement.move(code);
                 } else {
                     alert('You Lost!');
