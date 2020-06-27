@@ -15,6 +15,8 @@ const snake = function () {
     const speed = 100;
     const snake = [];
     const snakeSize = 20;
+    const snakeColor = "#FFFFFF";
+    const eggColor = "#0000FF";
 
     //Mutable vars
     let eggX;
@@ -44,7 +46,6 @@ const snake = function () {
 
         //Setup canvas context to draw in white
         ctx = canvas.getContext("2d");
-        ctx.fillStyle = "#FFFFFF";
 
         //Setup snake to start with length of 3
         snake.push([snakeX, snakeY]);
@@ -56,7 +57,7 @@ const snake = function () {
         //Draw snake on canvas
         for (let i = 1; i <= snake.length; i++) {
             const xy = snake[i - 1];
-            ctx.fillRect(xy[0], xy[1], snakeSize, snakeSize);
+            fillRect(snakeColor, xy[0], xy[1]);
         }
 
         drawEgg();
@@ -72,7 +73,12 @@ const snake = function () {
         eggY -= eggY % snakeSize;
 
         //Draw egg on canvas
-        ctx.fillRect(eggX, eggY, snakeSize, snakeSize);
+        fillRect(eggColor, eggX, eggY);
+    }
+
+    const fillRect = function(color, x, y) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, snakeSize, snakeSize);
     }
 
     const movement = {
@@ -119,7 +125,7 @@ const snake = function () {
 
                 //Add new snake addition to array and draw it on canvas
                 snake.push([snakeX, snakeY]);
-                ctx.fillRect(snakeX, snakeY, snakeSize, snakeSize);
+                fillRect(snakeColor, snakeX, snakeY);
 
                 //Remove oldest snake addition from array and clear it from canvas
                 const old = snake.shift();
@@ -130,6 +136,7 @@ const snake = function () {
                     //Check if snake is eating the egg
                     if (snakeY === eggY && snakeX === eggX) {
                         snake.push([eggX, eggY]);
+                        fillRect(eggColor, eggX, eggY);
                         drawEgg();
                     }
                     movement.move(code);
