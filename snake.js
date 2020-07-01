@@ -39,13 +39,7 @@ const snake = function () {
         snakeX -= snakeX % snakeSize;
         snakeY -= snakeY % snakeSize;
 
-        //Resize canvas to be full screen
-        const canvas = document.getElementsByClassName("canvas")[0];
-        canvas.width = width;
-        canvas.height = height;
-
-        //Setup canvas context to draw in white
-        ctx = canvas.getContext("2d");
+        resizeCanvas();
 
         //Setup snake to start with length of 3
         snake.push([snakeX, snakeY]);
@@ -61,6 +55,16 @@ const snake = function () {
         }
 
         drawEgg();
+    }
+
+    const resizeCanvas = function() {
+        //Resize canvas to be full screen
+        const canvas = document.getElementsByClassName("canvas")[0];
+        canvas.width = width;
+        canvas.height = height;
+
+        //Setup canvas context to draw in white
+        ctx = canvas.getContext("2d");
     }
 
     const drawEgg = function () {
@@ -132,7 +136,7 @@ const snake = function () {
                 ctx.clearRect(old[0], old[1], snakeSize, snakeSize);
 
                 //Check if snake will hit the edge
-                if (snakeX > 0 && snakeX < width && snakeY > 0 && snakeY < height) {
+                if (snakeX >= 0 && snakeX <= width && snakeY >= 0 && snakeY <= height) {
                     //Check if snake is eating the egg
                     if (snakeY === eggY && snakeX === eggX) {
                         snake.push([eggX, eggY]);
@@ -153,7 +157,7 @@ const snake = function () {
 
     document.addEventListener('DOMContentLoaded', setupGame);
     window.addEventListener('keydown', movement.startMove);
-    // window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('resize', resizeCanvas);
 }
 
 snake();
