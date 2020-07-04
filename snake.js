@@ -14,9 +14,16 @@ const snake = function () {
     //Snake constants
     const speed = 100;
     const snakeSize = 20;
+    const backgroundColor = "#000000";
     const borderColor = "#FFFFFF";
     const snakeColor = "#FFFFFF";
     const eggColor = "#0000FF";
+
+    //Edges of canvas
+    let lEdge;
+    let tEdge;
+    let rEdge;
+    let bEdge;
 
     //Mutable vars
     const snake = [];
@@ -61,20 +68,30 @@ const snake = function () {
     const resizeCanvas = function () {
         //Resize canvas to be full screen
         const canvas = document.getElementsByClassName("canvas")[0];
+        width = window.innerWidth;
+        height = window.innerHeight;
         canvas.width = width;
         canvas.height = height;
 
         //Setup canvas context
         ctx = canvas.getContext("2d");
 
+        //Paint it black
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        //Calculate edges based on window size relative to snake size
+        lEdge = (width % snakeSize) / 2;
+        tEdge = (height % snakeSize) / 2;
+        rEdge = width - lEdge;
+        bEdge = height - tEdge;
+
         //Draw border around page
-        const extraWidth = (width % snakeSize) / 2;
-        const extraHeight = (height % snakeSize) / 2;
         ctx.fillStyle = borderColor;
-        ctx.fillRect(0, 0, width, extraHeight);
-        ctx.fillRect(0, height - extraHeight, width, extraHeight);
-        ctx.fillRect(0, 0, extraWidth, height);
-        ctx.fillRect(width - extraWidth, 0, extraWidth, height);
+        ctx.fillRect(0, 0, lEdge, height);
+        ctx.fillRect(0, 0, width, tEdge);
+        ctx.fillRect(rEdge, tEdge, width, bEdge);
+        ctx.fillRect(lEdge, bEdge, rEdge, height);
     }
 
     const drawEgg = function () {
