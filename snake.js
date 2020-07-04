@@ -15,15 +15,9 @@ const snake = function () {
     const speed = 100;
     const snakeSize = 20;
     const backgroundColor = "#000000";
-    const borderColor = "#FFFFFF";
+    const borderColor = "#888888";
     const snakeColor = "#FFFFFF";
     const eggColor = "#0000FF";
-
-    //Edges of canvas
-    let lEdge;
-    let tEdge;
-    let rEdge;
-    let bEdge;
 
     //Mutable vars
     const snake = [];
@@ -36,17 +30,6 @@ const snake = function () {
     let ctx;
 
     const setupGame = function () {
-        width = window.innerWidth;
-        height = window.innerHeight;
-
-        //Start snake in middle of screen
-        snakeX = Math.floor(width / 2);
-        snakeY = Math.floor(height / 2);
-
-        //Normalize snake location to be on grid
-        snakeX -= snakeX % snakeSize;
-        snakeY -= snakeY % snakeSize;
-
         resizeCanvas();
 
         //Setup snake to start with length of 3
@@ -66,12 +49,22 @@ const snake = function () {
     }
 
     const resizeCanvas = function () {
+        //Remove scrollbars and paint page background (border)
+        document.body.style.margin = 0;
+        document.body.style.backgroundColor = borderColor;
+
+        //Calculate width, height, and pixels needed to center canvas
+        const xPixels = window.innerWidth % snakeSize;
+        const yPixels = window.innerHeight % snakeSize;
+        width = window.innerWidth - xPixels;
+        height = window.innerHeight - yPixels;
+
         //Resize canvas to be full screen
         const canvas = document.getElementsByClassName("canvas")[0];
-        width = window.innerWidth;
-        height = window.innerHeight;
         canvas.width = width;
         canvas.height = height;
+        canvas.style.paddingLeft = (xPixels / 2) + 'px';
+        canvas.style.paddingTop = (yPixels / 2) + 'px';
 
         //Setup canvas context
         ctx = canvas.getContext("2d");
@@ -80,18 +73,11 @@ const snake = function () {
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        //Calculate edges based on window size relative to snake size
-        lEdge = (width % snakeSize) / 2;
-        tEdge = (height % snakeSize) / 2;
-        rEdge = width - lEdge;
-        bEdge = height - tEdge;
-
-        //Draw border around page
-        ctx.fillStyle = borderColor;
-        ctx.fillRect(0, 0, lEdge, height);
-        ctx.fillRect(0, 0, width, tEdge);
-        ctx.fillRect(rEdge, tEdge, width, bEdge);
-        ctx.fillRect(lEdge, bEdge, rEdge, height);
+        //Start snake in middle of screen
+        const halfWidth = width / 2;
+        const halfHeight = height / 2;
+        snakeX = halfWidth + (halfWidth % 20);
+        snakeY = halfHeight + (halfHeight % 20);
     }
 
     const drawEgg = function () {
@@ -155,7 +141,7 @@ const snake = function () {
                 movement.prevCode = code;
 
                 //Check if snake will hit an edge or itself
-                if (snakeX >= 0 && snakeX <= width && snakeY >= 0 && snakeY <= height && !snake.some(e => (e.x === snakeX && e.y === snakeY))) {
+                if (snakeX >= 0 && snakeX < width && snakeY >= 0 && snakeY < height && !snake.some(e => (e.x === snakeX && e.y === snakeY))) {
 
                     //Add new snake additions to array and draw it on the canvas
                     snake.push({ x: snakeX, y: snakeY });
