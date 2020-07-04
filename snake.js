@@ -163,7 +163,7 @@ const snake = function () {
 
                     //Remove oldest snake addition from array and clear it from the canvas
                     const old = snake.shift();
-                    ctx.clearRect(old.x, old.y, snakeSize, snakeSize);
+                    fillRect(backgroundColor, old.x, old.y);
 
                     //Check if snake is eating the egg
                     if (snakeY === eggY && snakeX === eggX) {
