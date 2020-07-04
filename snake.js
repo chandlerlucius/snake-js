@@ -13,12 +13,13 @@ const snake = function () {
 
     //Snake constants
     const speed = 100;
-    const snake = [];
     const snakeSize = 20;
+    const borderColor = "#FFFFFF";
     const snakeColor = "#FFFFFF";
     const eggColor = "#0000FF";
 
     //Mutable vars
+    const snake = [];
     let eggX;
     let eggY;
     let snakeX;
@@ -42,29 +43,38 @@ const snake = function () {
         resizeCanvas();
 
         //Setup snake to start with length of 3
-        snake.push([snakeX, snakeY]);
+        snake.push({ x: snakeX, y: snakeY });
         snakeX += snakeSize;
-        snake.push([snakeX, snakeY]);
+        snake.push({ x: snakeX, y: snakeY });
         snakeX += snakeSize;
-        snake.push([snakeX, snakeY]);
+        snake.push({ x: snakeX, y: snakeY });
 
         //Draw snake on canvas
         for (let i = 1; i <= snake.length; i++) {
             const xy = snake[i - 1];
-            fillRect(snakeColor, xy[0], xy[1]);
+            fillRect(snakeColor, xy.x, xy.y);
         }
 
         drawEgg();
     }
 
-    const resizeCanvas = function() {
+    const resizeCanvas = function () {
         //Resize canvas to be full screen
         const canvas = document.getElementsByClassName("canvas")[0];
         canvas.width = width;
         canvas.height = height;
 
-        //Setup canvas context to draw in white
+        //Setup canvas context
         ctx = canvas.getContext("2d");
+
+        //Draw border around page
+        const extraWidth = (width % snakeSize) / 2;
+        const extraHeight = (height % snakeSize) / 2;
+        ctx.fillStyle = borderColor;
+        ctx.fillRect(0, 0, width, extraHeight);
+        ctx.fillRect(0, height - extraHeight, width, extraHeight);
+        ctx.fillRect(0, 0, extraWidth, height);
+        ctx.fillRect(width - extraWidth, 0, extraWidth, height);
     }
 
     const drawEgg = function () {
@@ -80,7 +90,7 @@ const snake = function () {
         fillRect(eggColor, eggX, eggY);
     }
 
-    const fillRect = function(color, x, y) {
+    const fillRect = function (color, x, y) {
         ctx.fillStyle = color;
         ctx.fillRect(x, y, snakeSize, snakeSize);
     }
@@ -91,9 +101,9 @@ const snake = function () {
 
         startMove(event) {
             //If same button pressed or opposite button pressed (left & right) return
-            if (event.code === snake.prevCode ||
-                (leftRight.indexOf(event.code) > -1 && leftRight.indexOf(snake.prevCode) > -1) ||
-                (upDown.indexOf(event.code) > -1 && upDown.indexOf(snake.prevCode) > -1)) {
+            if (event.code === movement.prevCode ||
+                (leftRight.indexOf(event.code) > -1 && leftRight.indexOf(movement.prevCode) > -1) ||
+                (upDown.indexOf(event.code) > -1 && upDown.indexOf(movement.prevCode) > -1)) {
                 return;
             }
 
@@ -125,24 +135,27 @@ const snake = function () {
                     default:
                         return;
                 }
-                snake.prevCode = code;
+                movement.prevCode = code;
 
-                //Add new snake addition to array and draw it on canvas
-                snake.push([snakeX, snakeY]);
-                fillRect(snakeColor, snakeX, snakeY);
+                //Check if snake will hit an edge or itself
+                if (snakeX >= 0 && snakeX <= width && snakeY >= 0 && snakeY <= height && !snake.some(e => (e.x === snakeX && e.y === snakeY))) {
 
-                //Remove oldest snake addition from array and clear it from canvas
-                const old = snake.shift();
-                ctx.clearRect(old[0], old[1], snakeSize, snakeSize);
+                    //Add new snake additions to array and draw it on the canvas
+                    snake.push({ x: snakeX, y: snakeY });
+                    fillRect(snakeColor, snakeX, snakeY);
 
-                //Check if snake will hit the edge
-                if (snakeX >= 0 && snakeX <= width && snakeY >= 0 && snakeY <= height) {
+                    //Remove oldest snake addition from array and clear it from the canvas
+                    const old = snake.shift();
+                    ctx.clearRect(old.x, old.y, snakeSize, snakeSize);
+
                     //Check if snake is eating the egg
                     if (snakeY === eggY && snakeX === eggX) {
                         snake.push([eggX, eggY]);
                         fillRect(eggColor, eggX, eggY);
                         drawEgg();
                     }
+
+                    //Move snake same direction again
                     movement.move(code);
                 } else {
                     alert('You Lost!');
