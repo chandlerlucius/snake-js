@@ -12,12 +12,14 @@ const snake = function () {
     const upDown = [w, up, s, down];
 
     //Snake constants
-    const speed = 100;
+    const speed = 75;
     const snakeSize = 20;
-    const backgroundColor = "#000000";
-    const borderColor = "#888888";
+    const canvasColor = "#0D47A1";
+    const backgroundColor = "#212121";
     const snakeColor = "#FFFFFF";
-    const eggColor = "#0000FF";
+    const eggColor = "#000000";
+    const maxWidth = 960;
+    const maxHeight = 720;
 
     //Mutable vars
     const snake = [];
@@ -51,26 +53,27 @@ const snake = function () {
     const resizeCanvas = function () {
         //Remove scrollbars and paint page background (border)
         document.body.style.margin = 0;
-        document.body.style.backgroundColor = borderColor;
+        document.body.style.backgroundColor = backgroundColor;
 
         //Calculate width, height, and pixels needed to center canvas
         const xPixels = window.innerWidth % snakeSize;
         const yPixels = window.innerHeight % snakeSize;
-        width = window.innerWidth - xPixels;
-        height = window.innerHeight - yPixels;
+        width = Math.min(window.innerWidth - xPixels, maxWidth);
+        height = Math.min(window.innerHeight - yPixels, maxHeight);
 
         //Resize canvas to be full screen
         const canvas = document.getElementsByClassName("canvas")[0];
         canvas.width = width;
         canvas.height = height;
-        canvas.style.paddingLeft = (xPixels / 2) + 'px';
-        canvas.style.paddingTop = (yPixels / 2) + 'px';
+        canvas.style.marginLeft = (window.innerWidth - width) / 2 + 'px';
+        canvas.style.marginTop = (window.innerHeight - height) / 2 + 'px';
+        canvas.style.boxShadow = '0 0 3px #000';
 
         //Setup canvas context
         ctx = canvas.getContext("2d");
 
         //Paint it black
-        ctx.fillStyle = backgroundColor;
+        ctx.fillStyle = canvasColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         //Start snake in middle of screen
@@ -149,7 +152,7 @@ const snake = function () {
 
                     //Remove oldest snake addition from array and clear it from the canvas
                     const old = snake.shift();
-                    fillRect(backgroundColor, old.x, old.y);
+                    fillRect(canvasColor, old.x, old.y);
 
                     //Check if snake is eating the egg
                     if (snakeY === eggY && snakeX === eggX) {
