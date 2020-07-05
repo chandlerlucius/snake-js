@@ -85,15 +85,25 @@ const snake = function () {
 
     const drawEgg = function () {
         //Pick a random place for egg to start
-        eggX = random(width - snakeSize);
-        eggY = random(height - snakeSize);
+        let randX = randomNumberInGrid(width);
+        let randY = randomNumberInGrid(height);
 
-        //Normalize egg location to place it on grid where snake will be
-        eggX -= eggX % snakeSize;
-        eggY -= eggY % snakeSize;
+        //Verify the random number is not where the egg currently is or part of the snake
+        while((eggX == randX && eggY == randY) || snake.some(e => (e.x === randX && e.y === randY))) {
+            randX = randomNumberInGrid(width);
+            randY = randomNumberInGrid(height);
+        }
+        eggX = randX;
+        eggY = randY;
 
         //Draw egg on canvas
         fillRect(eggColor, eggX, eggY);
+    }
+
+    const randomNumberInGrid = function (max) {
+        let rand = Math.floor(Math.random() * Math.floor(max - snakeSize));
+        rand -= rand % snakeSize;
+        return rand;
     }
 
     const fillRect = function (color, x, y) {
@@ -168,10 +178,6 @@ const snake = function () {
                 }
             }, speed);
         }
-    }
-
-    const random = function (max) {
-        return Math.floor(Math.random() * Math.floor(max));
     }
 
     document.addEventListener('DOMContentLoaded', setupGame);
